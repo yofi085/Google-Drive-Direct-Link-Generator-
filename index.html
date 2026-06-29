@@ -40,7 +40,7 @@
         <p id="errorMessage" class="text-red-500 text-sm mt-4 hidden text-center font-medium">⚠️ Format link tidak valid. Pastikan link asli dari Google Drive.</p>
     </div>
 
-    <script>
+<script>
         function generateLink() {
             const inputLink = document.getElementById('driveLink').value.trim();
             const resultContainer = document.getElementById('resultContainer');
@@ -80,15 +80,22 @@
             const directLinkInput = document.getElementById('directLink');
             const copyMessage = document.getElementById('copyMessage');
             
+            // Pilih teks di dalam kolom
             directLinkInput.select();
-            directLinkInput.setSelectionRange(0, 99999); // Untuk perangkat mobile
+            directLinkInput.setSelectionRange(0, 99999); // Kompatibilitas untuk mobile
             
-            navigator.clipboard.writeText(directLinkInput.value).then(() => {
+            // Gunakan metode copy klasik yang berfungsi di file lokal (file:///)
+            try {
+                document.execCommand('copy');
                 copyMessage.classList.remove('hidden');
+                
+                // Hilangkan notifikasi setelah 2.5 detik
                 setTimeout(() => {
                     copyMessage.classList.add('hidden');
                 }, 2500);
-            });
+            } catch (err) {
+                alert("Browser Anda tidak mendukung auto-copy. Silakan copy manual.");
+            }
         }
     </script>
 </body>
