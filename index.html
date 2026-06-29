@@ -6,11 +6,11 @@
     <title>G-Drive Direct Link Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
-    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans p-4">
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md border border-gray-200">
         <div class="text-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">Drive Link Generator</h1>
-            <p class="text-sm text-gray-500 mt-1">Ubah link G-Drive biasa menjadi direct link (langsung buka foto/file)</p>
+            <p class="text-sm text-gray-500 mt-1">Ubah link G-Drive biasa menjadi direct link untuk Foto atau Video</p>
         </div>
         
         <div class="mb-5">
@@ -19,6 +19,22 @@
             </label>
             <input class="shadow-sm appearance-none border border-gray-300 rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition" id="driveLink" type="text" placeholder="https://drive.google.com/file/d/.../view">
         </div>
+
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2">
+                Pilih Tipe File
+            </label>
+            <div class="flex gap-4">
+                <label class="flex items-center cursor-pointer">
+                    <input type="radio" name="fileType" value="photo" class="form-radio h-5 w-5 text-blue-600" checked>
+                    <span class="ml-2 text-gray-700">📷 Foto / Gambar</span>
+                </label>
+                <label class="flex items-center cursor-pointer">
+                    <input type="radio" name="fileType" value="video" class="form-radio h-5 w-5 text-red-600">
+                    <span class="ml-2 text-gray-700">🎬 Video (Player)</span>
+                </label>
+            </div>
+        </div>
         
         <button onclick="generateLink()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200 shadow-md">
             Generate Direct Link
@@ -26,7 +42,7 @@
         
         <div id="resultContainer" class="mt-6 hidden">
             <label class="block text-gray-700 text-sm font-bold mb-2" for="directLink">
-                Hasil Direct Link
+                Hasil Link
             </label>
             <div class="flex">
                 <input class="shadow-sm appearance-none border border-gray-300 rounded-l w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none bg-gray-50" id="directLink" type="text" readonly>
@@ -40,13 +56,16 @@
         <p id="errorMessage" class="text-red-500 text-sm mt-4 hidden text-center font-medium">⚠️ Format link tidak valid. Pastikan link asli dari Google Drive.</p>
     </div>
 
-<script>
+    <script>
         function generateLink() {
             const inputLink = document.getElementById('driveLink').value.trim();
             const resultContainer = document.getElementById('resultContainer');
             const directLinkInput = document.getElementById('directLink');
             const errorMessage = document.getElementById('errorMessage');
             const copyMessage = document.getElementById('copyMessage');
+            
+            // Cek tipe file yang dipilih (photo atau video)
+            const fileType = document.querySelector('input[name="fileType"]:checked').value;
             
             // Sembunyikan pesan sebelumnya
             errorMessage.classList.add('hidden');
@@ -68,7 +87,16 @@
             }
             
             if (fileId) {
-                const directLink = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                let directLink = "";
+                
+                if (fileType === "photo") {
+                    // Format Foto
+                    directLink = `https://drive.google.com/uc?export=view&id=${fileId}`;
+                } else {
+                    // Format Video Player (Preview Mode)
+                    directLink = `https://drive.google.com/file/d/${fileId}/preview`;
+                }
+                
                 directLinkInput.value = directLink;
                 resultContainer.classList.remove('hidden');
             } else {
@@ -80,16 +108,14 @@
             const directLinkInput = document.getElementById('directLink');
             const copyMessage = document.getElementById('copyMessage');
             
-            // Pilih teks di dalam kolom
             directLinkInput.select();
             directLinkInput.setSelectionRange(0, 99999); // Kompatibilitas untuk mobile
             
-            // Gunakan metode copy klasik yang berfungsi di file lokal (file:///)
+            // Gunakan metode copy klasik
             try {
                 document.execCommand('copy');
                 copyMessage.classList.remove('hidden');
                 
-                // Hilangkan notifikasi setelah 2.5 detik
                 setTimeout(() => {
                     copyMessage.classList.add('hidden');
                 }, 2500);
